@@ -1,101 +1,114 @@
 <html>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 
-  <style>
-  .container {
-    display: flex;
-  }
-  .container > div {
-    flex: 1; /*grow*/
-  }
-  </style>
-
-  <body>
+<style>
+    .container {
+        display: flex;
+    }
     
+    .container>div {
+        flex: 1;
+        /*grow*/
+    }
+</style>
+
+<body>
+
     <div class="container">
-      <p id='server-time'>Time</p>&nbsp;&nbsp;
-      <p id='server-minutes'>Minutes</p>
+        <p id='server-time'>Time</p>&nbsp;&nbsp;
+        <p id='server-minutes'>Minutes</p>
     </div>
 
-<div ng-app="myApp" ng-controller="myCtrl">
-    <h3>Your Name : <input type="text" ng-model="name">&nbsp;&nbsp;<span id="favcolor"><small>Favorite Colour: <ins>{{color}}</ins></small></span>&nbsp;&nbsp;Hello <mark><i>{{name}}</i></mark></h3>
-    <hr />
-</div>
-    
-    
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <h3>Your Name : <input type="text" ng-model="name">&nbsp;&nbsp;<span id="favcolor"><small>Favorite Colour: <ins>{{color}}</ins></small></span>&nbsp;&nbsp;Hello <mark><i>{{name}}</i></mark></h3>
+        <hr />
+    </div>
+
+
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
-      var el = document.getElementById('server-time');
-      var elmin = document.getElementById('server-minutes');
+        var socket = io();
+        var el = document.getElementById('server-time');
+        var elmin = document.getElementById('server-minutes');
 
-      socket.on('time', function(timeString) {
-        el.innerHTML = 'Server time: ' + timeString;
-        var d = new Date();
-        
-        var minute = d.getMinutes();
-        elmin.innerHTML = 'Server minutes: ' + minute;
-        if (minute % 2 == 0)
-        {
-          elmin.style.color = "red";
-        }
-          else
-        {
-          elmin.style.color = "blue";
-        }
-      });
+        socket.on('time', function(timeString) {
+            el.innerHTML = 'Server time: ' + timeString;
+            var d = new Date();
 
-      
-    socket.on('message', function (data) {
-        $('#conversation').append('</br>' + data.message);
-    });
-
-    
-    socket.on('numbers', function (data) {
-        var random1 = Math.round(data.number1);
-        var random2 = Math.round(data.number2);
-        document.getElementById("numbers").textContent = "Generated Numbers: " + random1 + ' and ' + random2;
-    });
-
-    var app = angular.module('myApp', []);
-    app.controller('myCtrl', function ($scope) {
-
-        socket.on('coloranim', function (data) {
-            //$('#conversation').append('</br>' + data.color);
-            document.getElementById("conversation").style.backgroundColor = data.color;
-            document.getElementById("favcolor").style.color = data.color;
-            $scope.color = data.color;
-            $scope.$digest();
+            var minute = d.getMinutes();
+            elmin.innerHTML = 'Server minutes: ' + minute;
+            if (minute % 2 == 0) {
+                elmin.style.color = "red";
+            } else {
+                elmin.style.color = "blue";
+            }
         });
-        
-    });
 
-    $(document).ready(function () {
-        $('#send').click(function () {
-            var msg = $('#text').val();
-            socket.emit('client_data', { 'letter': msg });
-        })
 
-        $('#color').click(function () {
-            var msg = $('#text').val();
-            socket.emit('client_color', { 'color': msg });
-        })
+        socket.on('message', function(data) {
+            $('#conversation').append('</br>' + data.message);
+        });
 
-        $('#numbers').click(function () {
-            var msg = $('#text').val();
-            socket.emit('client_numbers', { 'random': msg });
-        })
-    });
+
+        socket.on('numbers', function(data) {
+            var random1 = Math.round(data.number1);
+            var random2 = Math.round(data.number2);
+            document.getElementById("numbers").textContent = "Generated Numbers: " + random1 + ' and ' + random2;
+        });
+
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function($scope) {
+
+            socket.on('coloranim', function(data) {
+                //$('#conversation').append('</br>' + data.color);
+                document.getElementById("conversation").style.backgroundColor = data.color;
+                document.getElementById("favcolor").style.color = data.color;
+                $scope.color = data.color;
+                $scope.$digest();
+            });
+
+        });
+
+        $(document).ready(function() {
+            $('#send').click(function() {
+                var msg = $('#text').val();
+                socket.emit('client_data', {
+                    'letter': msg
+                });
+            })
+
+            $('#color').click(function() {
+                var msg = $('#text').val();
+                socket.emit('client_color', {
+                    'color': msg
+                });
+            })
+
+            $('#numbers').click(function() {
+                var msg = $('#text').val();
+                socket.emit('client_numbers', {
+                    'random': msg
+                });
+            })
+
+            var c = document.getElementById("colorpick");
+            res = document.getElementById("conversation");
+            c.addEventListener("input", function() {
+                res.style.backgroundColor = c.value;
+            }, false);
+        });
     </script>
 
-    
 
-<input id="text" />
-<button id="send">Send Message</button>
-<button id="color">Change Color</button>
-<button id="numbers">Generate Numbers</button>
-<div id="conversation">This is our chat conversation</div>
-  </body>
+
+    <input id="text" />
+    <button id="send">Send Message</button>
+    <button id="color">Change Color</button>
+    <input type="color" name="pickcolor" id="colorpick">
+    <button id="numbers">Generate Numbers</button>
+    <div id="conversation">This is our chat conversation</div>
+</body>
+
 </html>

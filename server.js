@@ -8,38 +8,38 @@ const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'index.html');
 
 const server = express()
-  .use((req, res) => res.sendFile(INDEX) )
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+    .use((req, res) => res.sendFile(INDEX))
+    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
-  console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
+    console.log('Client connected');
+    socket.on('disconnect', () => console.log('Client disconnected'));
 
-  //Send Data From Server To Client
-    socket.emit('message', { 'message': 'Hello this message is from Server, setting first color' });
-    socket.emit('coloranim', { 'color': 'Blue' });
-    socket.emit('numbers', { 'number1': '11', 'number2': '22' });
-    
+    //Send Data From Server To Client
+    socket.emit('message', { 'message': 'Hello from the Server, Setting first color!' });
+    socket.emit('coloranim', { 'color': 'LightBlue' });
+    socket.emit('numbers', { 'number1': '1', 'number2': '2' });
+
     //Receive Data From Client
-    socket.on('client_data', function (data) {
-        
+    socket.on('client_data', function(data) {
+
         socket.emit('message', { 'message': data.letter });
         socket.broadcast.emit('message', { 'message': data.letter });
         //process.stdout.write(data.letter);
         console.log(data.letter);
     });
 
-    socket.on('client_color', function (data) {
-        
+    socket.on('client_color', function(data) {
+
         socket.emit('coloranim', { 'color': data.color });
         socket.broadcast.emit('coloranim', { 'color': data.color });
         //process.stdout.write(data.color);
         console.log(data.color);
     });
-        
-    socket.on('client_numbers', function (data) {
+
+    socket.on('client_numbers', function(data) {
         //console.log(JSON.stringify(data));
         var ran1 = Math.random() * 100;
         var ran2 = Math.random() * 200;
